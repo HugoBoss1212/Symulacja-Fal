@@ -13,7 +13,6 @@ Shader::Shader(const std::string filepath): m_FilePath(filepath), m_RendererID(0
 	ShaderProgramSource source = ParseShader(filepath);
 	m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
 }
-
 Shader::~Shader() {
 	GLCall(glDeleteProgram(m_RendererID));
 }
@@ -60,7 +59,6 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 
 	return id;
 }
-
 unsigned int Shader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader) {
 	unsigned int program = glCreateProgram();
 	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
@@ -80,11 +78,19 @@ unsigned int Shader::CreateShader(const std::string& vertexShader, const std::st
 void Shader::Bind() const {
 	GLCall(glUseProgram(m_RendererID));
 }
-
 void Shader::Unbind() const {
 	GLCall(glUseProgram(0));
 }
 
+void Shader::SetUniform1f(const std::string & name, float v0) {
+	GLCall(glUniform1f(GetUniformLocation(name), v0));
+}
+void Shader::SetUniform2f(const std::string & name, float v0, float v1) {
+	GLCall(glUniform2f(GetUniformLocation(name), v0, v1));
+}
+void Shader::SetUniform3f(const std::string & name, float v0, float v1, float v2) {
+	GLCall(glUniform3f(GetUniformLocation(name), v0, v1, v2));
+}
 void Shader::SetUniform4f(const std::string & name, float v0, float v1, float v2, float v3) {
 	GLCall(glUniform4f(GetUniformLocation(name), v0, v1, v2, v3));
 }
