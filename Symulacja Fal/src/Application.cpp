@@ -12,6 +12,9 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include "glm\glm.hpp"
+#include "glm\gtc\matrix_transform.hpp"
+
 
 int main(void) {
 
@@ -20,7 +23,7 @@ int main(void) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	window = glfwCreateWindow(400, 400, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(800, 600, "Hello World", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		return -1;
@@ -31,6 +34,34 @@ int main(void) {
 	std::cout << glGetString(GL_VERSION) << std::endl;
 	
 	{
+		/*
+		std::vector<float> grid_v = {};
+		for (int i = -100; i <= 100; i++) {
+			for (int j = -100; j <= 100; j++) {
+				grid_v.push_back((float)(j) / 100);
+				grid_v.push_back((float)(i) / 100);
+			}
+		}
+		float* grid = &grid_v[0];
+		int grid_s = grid_v.size();
+		std::vector<unsigned int> idices_v = {};
+		unsigned int k = 200;
+		for (unsigned int i = 0; i < 40200; i++) {
+			if (i != 0) if (i % k == 0) {
+				k += 201;
+				continue;
+			}
+			idices_v.push_back(i);
+			idices_v.push_back(i+1);
+			idices_v.push_back(i+201);
+			idices_v.push_back(i+1);
+			idices_v.push_back(i+201);
+			idices_v.push_back(i+202);
+		}
+		unsigned int* indices = &idices_v[0];
+		int indices_s = idices_v.size();
+		*/
+
 		float grid[] = {
 			-0.5f, -0.5f, 0.0f, 0.0f,
 			0.5f, -0.5f, 1.0f, 0.0f,
@@ -55,9 +86,13 @@ int main(void) {
 		va.AddBuffer(vb, layout);
 		IndexBuffer ib(indices, indices_s);
 
+		glm::mat4 proj = glm::ortho(-4.0f, 4.0f, -3.0f, 3.0f, -1.0f, 1.0f);
+		//aspect ratio
+
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
 		shader.SetUniform4f("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
+		shader.SetUniformMat4f("u_MVP",proj);
 
 		Texture texture("res/textures/test.png");
 		texture.Bind();
