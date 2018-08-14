@@ -12,8 +12,16 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include "imgui\imgui.h"
+#include "imgui\imgui_impl_glfw.h"
+#include "imgui\imgui_impl_opengl3.h"
+
 #include "glm\glm.hpp"
 #include "glm\gtc\matrix_transform.hpp"
+
+// Window size
+#define WIDTH 1280.0f
+#define HEIGHT 720.0f
 
 
 int main(void) {
@@ -23,7 +31,7 @@ int main(void) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	window = glfwCreateWindow(800, 600, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		return -1;
@@ -63,10 +71,10 @@ int main(void) {
 		*/
 
 		float grid[] = {
-			-0.5f, -0.5f, 0.0f, 0.0f,
-			0.5f, -0.5f, 1.0f, 0.0f,
-			0.5f, 0.5f, 1.0f, 1.0f,
-			-0.5f, 0.5f, 0.0f, 1.0f
+			0.0f, 0.0f, 0.0f, 0.0f,
+			200.0f, 0.0f, 1.0f, 0.0f,
+			200.0f, 200.0f, 1.0f, 1.0f,
+			0.0f, 200.0f, 0.0f, 1.0f
 		};
 		int grid_s = (sizeof(grid) / sizeof(*grid));
 		unsigned int indices[] = {
@@ -86,13 +94,12 @@ int main(void) {
 		va.AddBuffer(vb, layout);
 		IndexBuffer ib(indices, indices_s);
 
-		glm::mat4 proj = glm::ortho(-4.0f, 4.0f, -3.0f, 3.0f, -1.0f, 1.0f);
-		//aspect ratio
+		glm::mat4 proj = glm::ortho(0.0f, WIDTH, 0.0f, HEIGHT, -1.0f, 1.0f);
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
 		shader.SetUniform4f("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
-		shader.SetUniformMat4f("u_MVP",proj);
 
 		Texture texture("res/textures/test.png");
 		texture.Bind();
@@ -105,24 +112,50 @@ int main(void) {
 
 		Renderer renderer;
 
+		ImGui::CreateContext();
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
+		ImGui_ImplOpenGL3_Init();
+		ImGui::StyleColorsDark();
+
+		glm::vec3 translation(0, 0, 0);
 		float r = 0.0f;
 		float increment = 0.05f;
 		while (!glfwWindowShouldClose(window)) {
 
 			renderer.Clear();
+
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+			glm::mat4 mvp = proj * view * model;
+
 			shader.Bind();
 			shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
+			shader.SetUniformMat4f("u_MVP", mvp);
 			renderer.Draw(va, ib, shader);
 
 			if (r > 1.0f) increment = -0.05f;
 			else if (r < 0.0f) increment = 0.05f;
 			r += increment;
 
+			{
+				ImGui::SliderFloat3("Translation Model", &translation.x, 0.0f, WIDTH);
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			}
+
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
 	}
 
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 	glfwTerminate();
 	return 0;
 }
