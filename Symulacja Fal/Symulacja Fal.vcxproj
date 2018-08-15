@@ -421,6 +421,15 @@
   <ItemGroup>
     <Image Include="res\textures\test.png" />
     <Image Include="res\textures\test2.png" />
+    <Image Include="res\textures\test21.png" />
+    <Image Include="res\textures\test22.png" />
+    <Image Include="res\textures\test23.png" />
+    <Image Include="res\textures\test24.png" />
+    <Image Include="res\textures\test25.png" />
+    <Image Include="res\textures\test26.png" />
+    <Image Include="res\textures\test27.png" />
+    <Image Include="res\textures\test28.png" />
+    <Image Include="res\textures\test29.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

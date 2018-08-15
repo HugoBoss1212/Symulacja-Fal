@@ -25,6 +25,8 @@
 #define HEIGHT 1200.0f
 #define PI      3.14159265358979323846
 
+unsigned int getTexture(int r);
+
 int main(void) {
 
 	GLFWwindow* window;
@@ -131,8 +133,26 @@ int main(void) {
 
 		Texture texture0("res/textures/test.png");
 		Texture texture1("res/textures/test2.png");
+		Texture texture2("res/textures/test21.png");
+		Texture texture3("res/textures/test22.png");
+		Texture texture4("res/textures/test23.png");
+		Texture texture5("res/textures/test24.png");
+		Texture texture6("res/textures/test25.png");
+		Texture texture7("res/textures/test26.png");
+		Texture texture8("res/textures/test27.png");
+		Texture texture9("res/textures/test28.png");
+		Texture texture10("res/textures/test29.png");
 		texture0.Bind(0);
 		texture1.Bind(1);
+		texture2.Bind(2);
+		texture3.Bind(3);
+		texture4.Bind(4);
+		texture5.Bind(5);
+		texture6.Bind(6);
+		texture7.Bind(7);
+		texture8.Bind(8);
+		texture9.Bind(9);
+		texture10.Bind(10);
 		shader.SetUniform1i("u_Texture", 0);
 
 		va.Unbind();
@@ -153,7 +173,7 @@ int main(void) {
 		glm::vec3 translationA(WIDTH / 2, HEIGHT / 2, 0);
 		glm::vec1 rotationA(0.0f);
 		glm::vec3 scaleA(100.0f, 100.0f, 0.0f);
-		glm::vec3 test(0, 0, 20);
+		glm::vec3 test(0, 0, 200);
 		float scale = 500;
 		int switch_tex = 0;
 		int switch_ind = 0;
@@ -193,8 +213,8 @@ int main(void) {
 				ImGui::SliderFloat3("Translation Model B", &translationB.x, 0.0f, WIDTH);
 				ImGui::SliderFloat("Rotation Model B", &rotationB[0], 0.0f, 360);
 				ImGui::SliderFloat("Scale Model B", &scale, -100, 1000);
-				ImGui::SliderFloat3("test", &test[0], -100, 500);
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS) \nScale: %.1f", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate, scaleB[0]);
+				ImGui::SliderFloat3("test", &test[0], -100, 700);
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS) \nScale: %.1f \t tex: %.1", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate, scaleB[0], getTexture(r));
 				ImGui::RadioButton("Red texture", &switch_tex, 0);
 				ImGui::RadioButton("White texture", &switch_tex, 1);
 				ImGui::RadioButton("Indices square", &switch_ind, 0);
@@ -208,7 +228,7 @@ int main(void) {
 				scaleB[1] = scale;
 				glm::mat4 mvp = proj * view * model;
 				shader.SetUniformMat4f("u_MVP", mvp);
-				if (switch_tex == 0) { shader.SetUniform1i("u_Texture", 1); } 
+				if (switch_tex == 0) { shader.SetUniform1i("u_Texture", getTexture(r)); }
 				else { shader.SetUniform1i("u_Texture", 0); }
 				shader.Bind();
 				renderer.Draw(va, ib, shader);
@@ -221,7 +241,7 @@ int main(void) {
 				scaleA[1] = scale;
 				glm::mat4 mvp = proj * view * model;
 				shader.SetUniformMat4f("u_MVP", mvp);
-				if (switch_tex == 0) { shader.SetUniform1i("u_Texture", 1); }
+				if (switch_tex == 0) { shader.SetUniform1i("u_Texture", getTexture(r)); }
 				else { shader.SetUniform1i("u_Texture", 0); }
 				shader.Bind();
 				renderer.Draw(va, ib, shader);
@@ -240,4 +260,21 @@ int main(void) {
 	ImGui::DestroyContext();
 	glfwTerminate();
 	return 0;
+}
+
+unsigned int getTexture(int r) {
+	unsigned int tex = 0;
+
+	if (r < 100) tex = 1;
+	else if (r >= 100 && r < 200) tex = 2;
+	else if (r >= 200 && r < 300) tex = 3;
+	else if (r >= 300 && r < 400) tex = 4;
+	else if (r >= 400 && r < 450) tex = 5;
+	else if (r >= 450 && r < 500) tex = 6;
+	else if (r >= 500 && r < 550) tex = 7;
+	else if (r >= 550 && r < 600) tex = 8;
+	else if (r >= 600 && r < 650) tex = 9;
+	else tex = 10;
+
+	return tex;
 }
