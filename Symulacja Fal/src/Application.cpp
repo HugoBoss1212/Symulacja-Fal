@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <vector>
+#include <math.h>
+#include <algorithm>
 
 #include "Renderer.h"
 #include "IndexBuffer.h"
@@ -19,10 +21,9 @@
 #include "glm\glm.hpp"
 #include "glm\gtc\matrix_transform.hpp"
 
-// Window size
-#define WIDTH 800.0f
-#define HEIGHT 600.0f
-
+#define WIDTH 1600.0f
+#define HEIGHT 1200.0f
+#define PI      3.14159265358979323846
 
 int main(void) {
 
@@ -74,7 +75,6 @@ int main(void) {
 						grid_v.push_back(1.0f);
 					}
 				}
-				grid_v.push_back((unsigned int)(0));
 				count++;
 			}
 		}
@@ -118,9 +118,9 @@ int main(void) {
 		VertexBufferlayout layout;
 		layout.Push<float>(2);
 		layout.Push<float>(2);
-		layout.Push<unsigned int>(1);
 		va.AddBuffer(vb, layout);
-		IndexBuffer ib(indices, indices_s);
+		IndexBuffer ib(0);
+		ib.Update(indices, indices_s);
 
 		glm::mat4 proj = glm::ortho(0.0f, WIDTH, 0.0f, HEIGHT, -1.0f, 1.0f);
 		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
@@ -147,26 +147,58 @@ int main(void) {
 		ImGui_ImplOpenGL3_Init();
 		ImGui::StyleColorsDark();
 
-		glm::vec3 translationB(400, 200, 0);
+		glm::vec3 translationB(WIDTH/2, HEIGHT/2, 0);
 		glm::vec1 rotationB(0.0f);
 		glm::vec3 scaleB(100.0f, 100.0f, 0.0f);
-		float scale = 0;
+		glm::vec3 translationA(WIDTH / 2, HEIGHT / 2, 0);
+		glm::vec1 rotationA(0.0f);
+		glm::vec3 scaleA(100.0f, 100.0f, 0.0f);
+		glm::vec3 test(0, 0, 20);
+		float scale = 500;
 		int switch_tex = 0;
+		int switch_ind = 0;
 
 		while (!glfwWindowShouldClose(window)) {
 
 			renderer.Clear();
+			
+				std::vector<unsigned int> idices_circle_v = {};
+				int cx = test[0];
+				int cy = test[1];
+				int r = test[2];
+				for (float a = 0; a < 2 * PI; a += PI/180) {
+					int x = cx + r*cos(a);
+					int y = cy + r*sin(a);
+					unsigned int test1 = (x + 100);
+					unsigned int test2 = (y + 100) * 201;
+					unsigned int indice = test1 + test2;
+					if ((indice + 1) % 201 == 0) continue;
+					idices_circle_v.push_back(indice);
+					idices_circle_v.push_back(indice + 1);
+					idices_circle_v.push_back(indice + 201);
+					idices_circle_v.push_back(indice + 1);
+					idices_circle_v.push_back(indice + 201);
+					idices_circle_v.push_back(indice + 202);
+				}
+				unsigned int* indices_circle = &idices_circle_v[0];
+				int indices_circle_s = idices_circle_v.size();
+				if (switch_ind == 1) ib.Update(indices_circle, indices_circle_s);
+				else ib.Update(indices, indices_s);			
 
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
+
 			{
 				ImGui::SliderFloat3("Translation Model B", &translationB.x, 0.0f, WIDTH);
 				ImGui::SliderFloat("Rotation Model B", &rotationB[0], 0.0f, 360);
 				ImGui::SliderFloat("Scale Model B", &scale, -100, 1000);
+				ImGui::SliderFloat3("test", &test[0], -100, 500);
 				ImGui::Text("Application average %.3f ms/frame (%.1f FPS) \nScale: %.1f", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate, scaleB[0]);
 				ImGui::RadioButton("Red texture", &switch_tex, 0);
 				ImGui::RadioButton("White texture", &switch_tex, 1);
+				ImGui::RadioButton("Indices square", &switch_ind, 0);
+				ImGui::RadioButton("Indices crirle", &switch_ind, 1);
 			}
 			{
 				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationB);
@@ -177,6 +209,19 @@ int main(void) {
 				glm::mat4 mvp = proj * view * model;
 				shader.SetUniformMat4f("u_MVP", mvp);
 				if (switch_tex == 0) { shader.SetUniform1i("u_Texture", 1); } 
+				else { shader.SetUniform1i("u_Texture", 0); }
+				shader.Bind();
+				renderer.Draw(va, ib, shader);
+			}
+			{
+				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
+				model = glm::rotate(model, glm::radians(rotationA[0] + 90), glm::vec3(0.f, 0.f, 1.f));
+				model = glm::scale(model, scaleA);
+				scaleA[0] = scale;
+				scaleA[1] = scale;
+				glm::mat4 mvp = proj * view * model;
+				shader.SetUniformMat4f("u_MVP", mvp);
+				if (switch_tex == 0) { shader.SetUniform1i("u_Texture", 1); }
 				else { shader.SetUniform1i("u_Texture", 0); }
 				shader.Bind();
 				renderer.Draw(va, ib, shader);
