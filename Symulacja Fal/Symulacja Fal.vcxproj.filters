@@ -904,32 +904,5 @@
     <Image Include="res\textures\test2.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\textures\test21.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\test22.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\test23.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\test24.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\test25.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\test26.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\test27.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\test28.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\test29.png">
-      <Filter>Resource Files</Filter>
-    </Image>
   </ItemGroup>
 </Project>
