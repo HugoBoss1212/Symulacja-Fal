@@ -17,7 +17,7 @@ public:
 	Particle(float angle, int cx, int cy);
 
 	void PolUpdate(int r, int cx, int cy);
-	void Alpha(int r);
+	float Alpha(int r);
 
 	inline float GetAlpha() const { return alpha; }
 	inline float GetAngle() const { return angle; }

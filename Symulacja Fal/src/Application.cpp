@@ -166,6 +166,7 @@ int main(void) {
 		int switch_ind = 1;
 		bool spawned = false;
 		int r = 0;
+		float alpha = 1;
 
 		while (!glfwWindowShouldClose(window)) {
 
@@ -190,7 +191,9 @@ int main(void) {
 					idices_circle_v.push_back(p.GetPoly()[3]);
 					idices_circle_v.push_back(p.GetPoly()[4]);
 					idices_circle_v.push_back(p.GetPoly()[5]);
+					alpha = p.Alpha(r);
 				}
+				std::cout << alpha << std::endl;
 
 				unsigned int* indices_circle = &idices_circle_v[0];
 				int indices_circle_s = idices_circle_v.size();

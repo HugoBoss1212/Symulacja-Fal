@@ -37,6 +37,7 @@ void Particle::PolUpdate(int r, int cx, int cy) {
 	}
 }
 
-void Particle::Alpha(int r) {
-
+float Particle::Alpha(int r) {
+	alpha = 2 * r * sin(((2 * PI) / 2*PI)*r - ((2*PI)/PI)*x + 10);
+	return alpha;
 }
