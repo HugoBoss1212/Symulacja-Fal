@@ -20,6 +20,7 @@ void Particle::PolUpdate(int r, int cx, int cy) {
 	x = start.x + cx + (r - start.z)*cos(angle);
 	y = start.y + cy + (r - start.z)*sin(angle);
 	//odbicie od œciany (zmiana k¹ta i nowy œrodek rysowanego ko³a)
+	//TODO *1
 	if ((x > 20 && x <22) || (x < -20 && x > -22) || (y > 20 && y < 22) || (y < -20 && y > -22) ) {
 		if (start.z == 0) {
 			start.z = r;
@@ -52,6 +53,7 @@ void Particle::PolUpdate(int r, int cx, int cy) {
 
 float Particle::Alpha(int r) {
 	//obliczanie drgañ jako alpha dla koloru
+	//TODO *2
 	alpha = 5 * r * sin(((2 * PI) / 10*PI)*r - ((2*PI)/PI)*x + 500);
 	return alpha;
 }

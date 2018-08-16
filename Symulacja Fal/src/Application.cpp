@@ -167,6 +167,7 @@ int main(void) {
 		ImGui::StyleColorsDark();
 
 		//Lista naszych punktów
+		//TODO zape³niæ instancjamy particjes ca³y obraz dla iluzji fali
 		std::list<Particle> particles;
 
 		//Zmienne startowe i do debugowania
@@ -203,6 +204,8 @@ int main(void) {
 				//update punktów dopuki nie wygaœnie fala
 				if (r < 300) {
 					for (Particle p : particles) {
+						//TODO *2 interferencja fal (badasz punkty pod wzglêdem alphy i je wzmacniasz lub wyciszasz)
+						//TODO *1 dodanie granic pokazowych
 						p.PolUpdate(r, cx, cy);
 						idices_circle_v.push_back(p.GetPoly()[0]);
 						idices_circle_v.push_back(p.GetPoly()[1]);
