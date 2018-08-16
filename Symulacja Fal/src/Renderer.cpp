@@ -7,6 +7,7 @@ void GLClearError() {
 }
 
 bool GLLogCall(const char* function, const char* file, int line) {
+	//obs³uga b³êdów openGL
 	while (GLenum error = glGetError()) {
 		std::cout << "[OpenGL Error] (" << error << "): " << function << " " << file << ":" << line << " " << std::endl;
 		return false;
@@ -19,6 +20,7 @@ void Renderer::Clear() const {
 }
 
 void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const {
+	//rysowanie trójk¹tów (poligonów)
 	shader.Bind();
 	va.Bind();
 	ib.Bind();

@@ -10,6 +10,7 @@ VertexArray::~VertexArray() {
 }
 
 void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferlayout& layout) {
+	//tworzenie VertexArray i podpinanie layautu 
 	Bind();
 	vb.Bind();
 	const auto& elements = layout.GetElements();
@@ -17,6 +18,7 @@ void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferlayout& la
 	for (unsigned int i = 0; i < elements.size(); i++) {
 		const auto& element = elements[i];
 		GLCall(glEnableVertexAttribArray(i));
+		//ofset do nastêpnej danej, ustalony przez layout
 		GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)offset));
 		offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
 	}

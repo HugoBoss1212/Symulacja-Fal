@@ -10,6 +10,7 @@
 
 
 Shader::Shader(const std::string filepath): m_FilePath(filepath), m_RendererID(0) {
+	//urucjmianie osobnego programu shader do rysowania
 	ShaderProgramSource source = ParseShader(filepath);
 	m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
 }
@@ -18,6 +19,7 @@ Shader::~Shader() {
 }
 
 ShaderProgramSource Shader::ParseShader(const std::string& filepath) {
+	//czytanie kodu dla rozsze¿enia .shader
 	std::ifstream stream(filepath);
 	enum class ShaderType { NONE = -1, VERTEX = 0, FRAGMENT = 1 };
 	std::string line;
@@ -39,6 +41,7 @@ ShaderProgramSource Shader::ParseShader(const std::string& filepath) {
 }
 
 unsigned int Shader::CompileShader(unsigned int type, const std::string& source) {
+	//kompilacja przed uruchomieniem dla sprawdzenia b³êdów
 	unsigned int id = glCreateShader(type);
 	const char* src = source.c_str();
 	GLCall(glShaderSource(id, 1, &src, nullptr));
@@ -60,6 +63,7 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 	return id;
 }
 unsigned int Shader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader) {
+	//two¿enie instancji shader dla openGL i pod³¹czanie pod g³ówny program
 	unsigned int program = glCreateProgram();
 	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
 	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
@@ -81,7 +85,7 @@ void Shader::Bind() const {
 void Shader::Unbind() const {
 	GLCall(glUseProgram(0));
 }
-
+//Uniformy do przesy³ania danych do shadera
 void Shader::SetUniform1i(const std::string & name, int v0) {
 	glUniform1i(GetUniformLocation(name), v0);
 }
@@ -100,7 +104,7 @@ void Shader::SetUniform4f(const std::string & name, float v0, float v1, float v2
 void Shader::SetUniformMat4f(const std::string & name, const glm::mat4& matrix) {
 	glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
 }
-
+//pozyskanie nazwy uniformów z programu shadera
 int Shader::GetUniformLocation(const std::string & name) {
 	if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
 		return m_UniformLocationCache[name];
