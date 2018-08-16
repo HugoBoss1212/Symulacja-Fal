@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <set>
 #include <math.h>
 
 #include "Renderer.h"
@@ -12,6 +13,7 @@
 #include "VertexArray.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Particle.h"
 
 #include "imgui\imgui.h"
 #include "imgui\imgui_impl_glfw.h"
@@ -25,6 +27,11 @@
 #define PI		3.14159265358979323846
 
 float getAlpha(int r);
+struct ParticlesCmp {
+	bool operator() (const Particle& p1, const Particle& p2) {
+		return p1.GetAngle() < p2.GetAngle();
+	}
+};
 
 int main(void) {
 
@@ -145,16 +152,20 @@ int main(void) {
 		ImGui_ImplOpenGL3_Init();
 		ImGui::StyleColorsDark();
 
+		std::list<Particle> particles;
+
 		glm::vec3 translationB(WIDTH/2, HEIGHT/2, 0);
 		glm::vec1 rotationB(0.0f);
 		glm::vec3 scaleB(100.0f, 100.0f, 0.0f);
 		glm::vec3 translationA(WIDTH / 2, HEIGHT / 2, 0);
 		glm::vec1 rotationA(0.0f);
 		glm::vec3 scaleA(100.0f, 100.0f, 0.0f);
-		glm::vec3 test(0, 0, 200);
+		glm::vec3 test(0, 0, 10);
 		float scale = 500;
 		int switch_tex = 0;
-		int switch_ind = 0;
+		int switch_ind = 1;
+		bool spawned = false;
+		int r = 0;
 
 		while (!glfwWindowShouldClose(window)) {
 
@@ -163,22 +174,24 @@ int main(void) {
 				std::vector<unsigned int> idices_circle_v = {};
 				int cx = test[0];
 				int cy = test[1];
-				int r = test[2];
-				for (float a = 0; a < 2 * PI; a += PI/180) {
-					int x = cx + r*cos(a);
-					int y = cy + r*sin(a);
-					unsigned int test1 = (x + 100);
-					unsigned int test2 = (y + 100) * 201;
-					unsigned int indice = test1 + test2;
-					if ((indice + 1) % 201 == 0) continue;
-					if (indice > 40200) continue;
-					idices_circle_v.push_back(indice);
-					idices_circle_v.push_back(indice + 1);
-					idices_circle_v.push_back(indice + 201);
-					idices_circle_v.push_back(indice + 1);
-					idices_circle_v.push_back(indice + 201);
-					idices_circle_v.push_back(indice + 202);
+				r = test[2];
+				test[2] ++;
+				if (!spawned) {
+					for (float a = 0; a < 2 * PI; a += PI / 180) {
+						particles.push_back(Particle(a, cx, cy));
+					}
+					spawned = !spawned;
 				}
+				for (Particle p : particles) {
+					p.PolUpdate(r, cx, cy);
+					idices_circle_v.push_back(p.GetPoly()[0]);
+					idices_circle_v.push_back(p.GetPoly()[1]);
+					idices_circle_v.push_back(p.GetPoly()[2]);
+					idices_circle_v.push_back(p.GetPoly()[3]);
+					idices_circle_v.push_back(p.GetPoly()[4]);
+					idices_circle_v.push_back(p.GetPoly()[5]);
+				}
+
 				unsigned int* indices_circle = &idices_circle_v[0];
 				int indices_circle_s = idices_circle_v.size();
 				if (switch_ind == 1) ib.Update(indices_circle, indices_circle_s);
@@ -192,8 +205,9 @@ int main(void) {
 				ImGui::SliderFloat3("Translation Model B", &translationB.x, 0.0f, WIDTH);
 				ImGui::SliderFloat("Rotation Model B", &rotationB[0], 0.0f, 360);
 				ImGui::SliderFloat("Scale Model B", &scale, -100, 1000);
+				ImGui::SliderFloat2("X and Y pos:", &test[0], -100, 100);
 				ImGui::SliderFloat("test of r", &test[2], -700, 700);
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS) \nScale: %.1f \t tex: %.1", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate, scaleB[0], getAlpha(r));
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS) \nScale: %.1f", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate, scaleB[0]);
 				ImGui::RadioButton("Red texture", &switch_tex, 0);
 				ImGui::RadioButton("White texture", &switch_tex, 1);
 				ImGui::RadioButton("Indices square", &switch_ind, 0);
@@ -208,19 +222,6 @@ int main(void) {
 				glm::mat4 mvp = proj * view * model;
 				shader.SetUniformMat4f("u_MVP", mvp);
 				if (switch_tex == 0) { shader.SetUniform4f("u_Color", 0.2f, 0.3f, 0.8f, getAlpha(r)); }
-				else { shader.SetUniform1i("u_Texture", 0); }
-				shader.Bind();
-				renderer.Draw(va, ib, shader);
-			}
-			{
-				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
-				model = glm::rotate(model, glm::radians(rotationA[0] + 90), glm::vec3(0.f, 0.f, 1.f));
-				model = glm::scale(model, scaleA);
-				scaleA[0] = scale;
-				scaleA[1] = scale;
-				glm::mat4 mvp = proj * view * model;
-				shader.SetUniformMat4f("u_MVP", mvp);
-				if (switch_tex == 0) { shader.SetUniform1i("u_Texture", getAlpha(r)); }
 				else { shader.SetUniform1i("u_Texture", 0); }
 				shader.Bind();
 				renderer.Draw(va, ib, shader);
